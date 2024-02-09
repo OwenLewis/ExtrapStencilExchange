@@ -11,7 +11,7 @@
 %
 %
 %     inputs:
-%         conc is a length Ncell+2 array which contains the concentrations
+%         conc is a length Ncell array which contains the concentrations
 %           (at cell centeres) of the species which is being advected. The
 %           first and last entries (ghost cells) should have already been 
 %           populated with whatever values respect the given boundary
@@ -76,6 +76,12 @@ switch flag
         if down > 0
             disp('Woops, you are downwinding')
         end
+
+        %We need to evaluate the concentration in the "ghost cell" which
+        %does not exist. We can do this via linear extrapolation from the
+        %two left-most interior cells. 
+        ghostvalue = 2*conc(1) - conc(2);
+        conc = [ghostvalue;conc];
         %Flux through this edge is velocity times the concentration in the
         %cell center TO THE LEFT
         flux = conc(1:end-1).*veloc;
