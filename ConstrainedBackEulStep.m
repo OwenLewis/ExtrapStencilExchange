@@ -37,16 +37,14 @@ advcur = AdvectionEvaluate(conccur,SolVeloc);
 %Add the reaction term
 explcur = GelState.HRHScur - advcur;
 
-%Begin construction of RHS for implicit solve
-RHSH = 0*conccur;
-
 %Populate the entries which correspond to cells within the computational
 %domain
-RHSH(2:end-1) = conccur(2:end-1) + dt*explcur;
+RHSH = conccur + dt*explcur;
     
-%Now we need to populate the entries which correspond to ghost cells with
-%the appropriate fluxes for Boundary Conditions.
-RHSH(1) = GelSimParams.HydFluxL;
+%Now we need to adjust the RHS vector to account for additional fluxes
+%potentially
+%%THIS CHUNK OF CODE NEEDS TO BE TESTED
+RHSH(1) = RHSH(1) + dt*GelSimParams.HydFluxL/GelSimParams.hx;
 RHSH(end) = GelSimParams.HydValR;
 
 
@@ -65,16 +63,14 @@ advcur = AdvectionEvaluate(conccur,SolVeloc);
 %Add the reaction term
 explcur = GelState.BRHScur - advcur;
 
-%Begin construction of RHS for implicit solve
-RHSB = 0*conccur;
-
 %Populate the entries which correspond to cells within the computational
 %domain
-RHSB(2:end-1) = conccur(2:end-1) + dt*explcur;
+RHSB = conccur + dt*explcur;
     
-%Now we need to populate the entries which correspond to ghost cells with
-%the appropriate fluxes for Boundary Conditions.
-RHSB(1) = GelSimParams.BicFluxL;
+%Now we need to adjust the RHS vector to account for additional fluxes
+%potentially
+%%THIS CHUNK OF CODE NEEDS TO BE TESTED
+RHSB(1) = RHSB(1) + dt*GelSimParams.BicFluxL/GelSimParams.hx;
 RHSB(end) = GelSimParams.BicValR;
 
 
@@ -93,16 +89,14 @@ advcur = AdvectionEvaluate(conccur,SolVeloc);
 %Add the reaction term
 explcur = GelState.IRHScur - advcur;
 
-%Begin construction of RHS for implicit solve
-RHSI = 0*conccur;
-
 %Populate the entries which correspond to cells within the computational
 %domain
-RHSI(2:end-1) = conccur(2:end-1) + dt*explcur;
+RHSI = conccur + dt*explcur;
 
-%Now we need to populate the entries which correspond to ghost cells with
-%the appropriate fluxes for Boundary Conditions.
-RHSI(1) = GelSimParams.IonFluxL;
+%Now we need to adjust the RHS vector to account for additional fluxes
+%potentially
+%%THIS CHUNK OF CODE NEEDS TO BE TESTED
+RHSI(1) = RHSI(1) + dt*GelSimParams.IonFluxL/GelSimParams.hx;
 RHSI(end) = GelSimParams.IonValR;
 
 
@@ -121,16 +115,13 @@ advcur = AdvectionEvaluate(conccur,SolVeloc);
 %Add the reaction terms
 explcur = GelState.ARHScur - advcur;
 
-%Begin construction of RHS for implicit solve
-RHSA = 0*conccur;
-
 %Populate the entries which correspond to cells within the computational
 %domain
-RHSA(2:end-1) = conccur(2:end-1) + dt*explcur;
+RHSA = conccur + dt*explcur;
 
 %Now we need to populate the entries which correspond to ghost cells with
 %the appropriate fluxes for Boundary Conditions.
-RHSA(1) = GelSimParams.AniFluxL;
+RHSA(1) = RHSA(1) + dt*GelSimParams.AniFluxL/GelSimParams.hx;
 RHSA(end) = GelSimParams.AniValR;
 
 
@@ -138,36 +129,36 @@ val = [1,-1,1,-1];
 
 L = ConstrainedBackEulOperatorConstruct(D,dt,val);
 
-RHS = [RHSH;RHSB;RHSI;RHSA;zeros(GelSimParams.Ncell+1,1)];
+RHS = [RHSH;RHSB;RHSI;RHSA;zeros(GelSimParams.Ncell,1)];
 
 newconcs = L\RHS;
 
 %Lets pluck out the entries corresponding to hydrogen
-concnew = newconcs(1:GelSimParams.Ncell+2);
+concnew = newconcs(1:GelSimParams.Ncell);
 %Current becomes old, and new becomes current
 GelState.Hold = GelState.Hconc;
 GelState.Hconc = concnew;
 
 %Now we'll pluck out the entries corresponding to bicarbonate
-concnew = newconcs(GelSimParams.Ncell+3:2*GelSimParams.Ncell+4);
+concnew = newconcs(GelSimParams.Ncell+1:2*GelSimParams.Ncell);
 %Current becomes old, and new becomes current
 GelState.Bold = GelState.Bconc;
 GelState.Bconc = concnew;
 
 %Now we'll pluck out the entries corresponding to negative Ions
-concnew = newconcs(2*GelSimParams.Ncell+5:3*GelSimParams.Ncell+6);
+concnew = newconcs(2*GelSimParams.Ncell+1:3*GelSimParams.Ncell);
 %Current becomes old, and new becomes current
 GelState.Iold = GelState.Iconc;
 GelState.Iconc = concnew;
 
 %Now we'll pluck out the entries corresponding to positive Anions
-concnew = newconcs(3*GelSimParams.Ncell+7:4*GelSimParams.Ncell+8);
+concnew = newconcs(3*GelSimParams.Ncell+1:4*GelSimParams.Ncell);
 %Current becomes old, and new becomes current
 GelState.Aold = GelState.Aconc;
 GelState.Aconc = concnew;
 
 %And finally, lets pluck out the electric potential gradient
-GelState.DPsi = newconcs(4*GelSimParams.Ncell+9:end);
+GelState.DPsi = newconcs(4*GelSimParams.Ncell+1:end);
 
 
  
