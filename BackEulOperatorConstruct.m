@@ -21,11 +21,9 @@
 %           appears in front of the wall concentration of this species in
 %           the boundary flux calculation
 %     output:
-%         Lfut is the Ncell+2 x Ncell+2 sparce matrix which will be
+%         Lfut is the Ncell x Ncell sparce matrix which will be
 %           applies  the operation of the SBD scheme to the future time
 %           step. This one will be inverted to solve for the new values.
-%         (The first and last entries are related to ghost cells
-%         and bounary condtions). 
 
 
 function Lfut = BackEulOperatorConstruct(DiffCoeff,dt,BndFluxCoeff)
@@ -51,34 +49,39 @@ D = DiffCoeff;
 %fraction
 workingSol = GelState.ThetaS;
 edgeSol = (GelState.ThetaS(1:end-1) + GelState.ThetaS(2:end))/2;
-edgeSol(1) = GelSimParams.SolValL;
+edgeSol(1) = 0;
 
 %Puting together the Laplacian-like operator for the Solvent
-LSolUDiag = D*(edgeSol(2:end))./(workingSol(2:end-1)*hx^2);
-LSolLDiag = D*(edgeSol(1:end-1))./(workingSol(2:end-1)*hx^2);
+LSolUDiag = D*(edgeSol(2:end-1))./(workingSol(2:end-2)*hx^2);
+LSolLDiag = D*(edgeSol(2:end-1))./(workingSol(3:end-1)*hx^2);
 LSolMDiag = -D*(edgeSol(1:end-1) + edgeSol(2:end))./(workingSol(2:end-1)*hx^2);
+
+%This is an adjustment to the last entry of the main diagonal to account
+%for dirichlet BC on a cell centered grid
+LSolMDiag(end) = LSolMDiag(end) -D*edgeSol(end)/(workingSol(end-1)*hx^2);
+
+%Now we need to adjust the first row to account for flux through the left
+%boundary
+factor = BndFluxCoeff*mean(workingSol(1:2))/(workingSol(2)*hx);
+
+LSolUDiag(1) = LSolUDiag(1) - factor/2;
+LSolMDiag(1) = LSolMDiag(1) + 3*factor/2;
+%%%The above adjustment basically specifies that there is a flux at the
+%%%left boundary which is given by F = BndFluxCoeff*C|x=0. We are
+%%%approximating C|x=0 via linear extrapolation from the first two interior
+%%%cell centers. 
 
 
 % keyboard
 %Now we will scale the diagonals of the diffusion operator for the
-%implicit SBD2 operator
+%implicit Back-Eul operator
 LImpUDiag = -dt*LSolUDiag;
 LImpLDiag = -dt*LSolLDiag;
 LImpMDiag = 1 - dt*LSolMDiag;
 
-%Now we need to correct for the boundary conditions
-%The entries to the front of MDiag and LDiag account for Robin BC's while
-%the entries to the end of MDiag and UDiag account for Neumann BC's
-LImpMDiag = [edgeSol(1)*(GelSimParams.SolVelValL+D/hx-BndFluxCoeff/2);LImpMDiag;edgeSol(end)/2];
-LImpUDiag = [edgeSol(1)*(-D/hx-BndFluxCoeff/2);LImpUDiag];
-LImpLDiag = [LImpLDiag;edgeSol(end)/2];
-
-
 
 
 %Final variable coefficient implicit operator
-Lfut = spdiags([LImpLDiag',0;LImpMDiag';0,LImpUDiag']',-1:1,Ncell+2,Ncell+2);
+Lfut = spdiags([LImpLDiag',0;LImpMDiag';0,LImpUDiag']',-1:1,Ncell,Ncell);
 
-%%%%This function has been fully testest and produces an operator which is
-%%%%second order accurate in space & used in a 2nd order time integrator.
 end
