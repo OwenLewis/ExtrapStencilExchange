@@ -1,6 +1,7 @@
 clear all
 close all
 global GelState GelSimParams
+addpath('../')
 
 
 GelSimParams.Ncell = 100;
@@ -13,7 +14,7 @@ GelSimParams.hx = 1/GelSimParams.Ncell;
 GelState.Xcell = linspace(GelSimParams.hx/2,1-GelSimParams.hx/2,GelSimParams.Ncell)';
 GelState.ThetaS = ones(GelSimParams.Ncell+2,1);
 
-rightval = 2;
+rightval = 1;
 slope = 2;
 
 C = slope*(GelState.Xcell - 1) + rightval;
@@ -21,7 +22,7 @@ plot(GelState.Xcell,C)
 pause;
 
 D = 1;
-k = -2;
+k = 2;
 L = BackEulOperatorConstruct(D,GelSimParams.dt,k);
 %%When it is ONLY diffusive flux that I am considering, this equates to the
 %%left boundary condition Flux = k*C_x=0
@@ -46,3 +47,6 @@ time
 % Linf = max(error)
 % L1 = sum(error)*GelSimParams.hx
 % L2 = sqrt(sum(error.^2)*GelSimParams.hx)
+
+
+rmpath('../')
