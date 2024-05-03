@@ -67,8 +67,8 @@ DImpUDiag = -dt*weightedges(2:end-1)./(GelState.ThetaS(2:end-2)*hx);
 
 %And assemble the operator
 Dfut1 = spdiags([DImpLDiag';DImpUDiag']',-1:0,Ncell,Nedge);
-% Dfut1(end,end-1) = Dfut1(end,end-1) - dt*weightedges(end)/(GelState.ThetaS(end-1)*hx);
-% Dfut1(end,end) = Dfut1(end,end) + dt*weightedges(end)/(GelState.ThetaS(end-1)*hx);
+Dfut1(end,end-1) = Dfut1(end,end-1) + dt*D(1)*val(1)*mean(GelState.ThetaS(end-1:end))*GelSimParams.HydValR/(GelState.ThetaS(end-1)*hx);
+Dfut1(end,end) = Dfut1(end,end) - 2*dt*D(1)*val(1)*mean(GelState.ThetaS(end-1:end))*GelSimParams.HydValR/(GelState.ThetaS(end-1)*hx);
 
 %Now on species two
 %Operator requires an approx of future concentration
@@ -90,8 +90,8 @@ DImpUDiag = -dt*weightedges(2:end-1)./(GelState.ThetaS(2:end-2)*hx);
 
 %And assemble the operator
 Dfut2 = spdiags([DImpLDiag';DImpUDiag']',-1:0,Ncell,Nedge);
-% Dfut2(end,end-1) = Dfut2(end,end-1) - dt*weightedges(end)/(GelState.ThetaS(end-1)*hx);
-% Dfut2(end,end) = Dfut2(end,end) + dt*weightedges(end)/(GelState.ThetaS(end-1)*hx);
+Dfut2(end,end-1) = Dfut2(end,end-1) + dt*D(2)*val(2)*mean(GelState.ThetaS(end-1:end))*GelSimParams.BicValR/(GelState.ThetaS(end-1)*hx);
+Dfut2(end,end) = Dfut2(end,end) - 2*dt*D(2)*val(2)*mean(GelState.ThetaS(end-1:end))*GelSimParams.BicValR/(GelState.ThetaS(end-1)*hx);
 
 %Now on species three
 %Operator requires an approx of future concentration
@@ -108,8 +108,8 @@ DImpUDiag = -dt*weightedges(2:end-1)./(GelState.ThetaS(2:end-2)*hx);
 
 %And assemble the operator
 Dfut3 = spdiags([DImpLDiag';DImpUDiag']',-1:0,Ncell,Nedge);
-% Dfut3(end,end-1) = Dfut3(end,end-1) - dt*weightedges(end)/(GelState.ThetaS(end-1)*hx);
-% Dfut3(end,end) = Dfut3(end,end) + dt*weightedges(end)/(GelState.ThetaS(end-1)*hx);
+Dfut3(end,end-1) = Dfut3(end,end-1) + dt*D(3)*val(3)*mean(GelState.ThetaS(end-1:end))*GelSimParams.IonValR/(GelState.ThetaS(end-1)*hx);
+Dfut3(end,end) = Dfut3(end,end) - 2*dt*D(3)*val(3)*mean(GelState.ThetaS(end-1:end))*GelSimParams.IonValR/(GelState.ThetaS(end-1)*hx);
 
 %Now species four
 %Operator requires an approx of future concentration
@@ -126,8 +126,8 @@ DImpUDiag = -dt*weightedges(2:end-1)./(GelState.ThetaS(2:end-2)*hx);
 
 %And assemble the operator
 Dfut4 = spdiags([DImpLDiag';DImpUDiag']',-1:0,Ncell,Nedge);
-% Dfut4(end,end-1) = Dfut4(end,end-1) - dt*weightedges(end)/(GelState.ThetaS(end-1)*hx);
-% Dfut4(end,end) = Dfut4(end,end) + dt*weightedges(end)/(GelState.ThetaS(end-1)*hx);
+Dfut4(end,end-1) = Dfut4(end,end-1) + dt*D(4)*val(4)*mean(GelState.ThetaS(end-1:end))*GelSimParams.AniValR/(GelState.ThetaS(end-1)*hx);
+Dfut4(end,end) = Dfut4(end,end) - 2*dt*D(4)*val(4)*mean(GelState.ThetaS(end-1:end))*GelSimParams.AniValR/(GelState.ThetaS(end-1)*hx);
 
 %Finally, we will need to construct the scaled identity matrices that go on
 %the diagonal.
