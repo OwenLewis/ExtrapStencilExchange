@@ -1,7 +1,7 @@
 clear all
 close all
 global GelState GelSimParams
-addpath('../')
+% addpath('../')
 
 
 GelSimParams.Ncell = 100;
@@ -49,4 +49,4 @@ time
 % L2 = sqrt(sum(error.^2)*GelSimParams.hx)
 
 
-rmpath('../')
+% rmpath('../')
