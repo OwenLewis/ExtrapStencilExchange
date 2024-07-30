@@ -45,7 +45,7 @@ RHSH = conccur + dt*explcur;
 %potentially
 %%THIS CHUNK OF CODE NEEDS TO BE TESTED
 RHSH(1) = RHSH(1) + dt*GelSimParams.HydFluxL/GelSimParams.hx;
-RHSH(end) = GelSimParams.HydValR;
+RHSH(end) = RHSH(end) + GelSimParams.HydValR*D(1)*dt*2/(GelSimParams.hx^2);
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -71,7 +71,7 @@ RHSB = conccur + dt*explcur;
 %potentially
 %%THIS CHUNK OF CODE NEEDS TO BE TESTED
 RHSB(1) = RHSB(1) + dt*GelSimParams.BicFluxL/GelSimParams.hx;
-RHSB(end) = GelSimParams.BicValR;
+RHSB(end) = RHSB(end) + GelSimParams.BicValR*D(2)*dt*2/(GelSimParams.hx^2);;
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -97,7 +97,7 @@ RHSI = conccur + dt*explcur;
 %potentially
 %%THIS CHUNK OF CODE NEEDS TO BE TESTED
 RHSI(1) = RHSI(1) + dt*GelSimParams.IonFluxL/GelSimParams.hx;
-RHSI(end) = GelSimParams.IonValR;
+RHSI(end) = RHSI(end) + GelSimParams.IonValR*D(3)*dt*2/(GelSimParams.hx^2);
 
 
 %%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%%
@@ -122,14 +122,14 @@ RHSA = conccur + dt*explcur;
 %Now we need to populate the entries which correspond to ghost cells with
 %the appropriate fluxes for Boundary Conditions.
 RHSA(1) = RHSA(1) + dt*GelSimParams.AniFluxL/GelSimParams.hx;
-RHSA(end) = GelSimParams.AniValR;
+RHSA(end) = RHSA(end) + GelSimParams.AniValR*D(4)*dt*2/(GelSimParams.hx^2);
 
 
 val = [1,-1,1,-1];
 
 L = ConstrainedBackEulOperatorConstruct(D,dt,val);
 
-RHS = [RHSH;RHSB;RHSI;RHSA;zeros(GelSimParams.Ncell,1)];
+RHS = [RHSH;RHSB;RHSI;RHSA;zeros(GelSimParams.Nedges,1)];
 
 newconcs = L\RHS;
 
