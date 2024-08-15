@@ -45,8 +45,8 @@ RHSH = conccur + dt*explcur;
 %Now we need to adjust the RHS vector to account for additional fluxes
 %potentially
 %%THIS CHUNK OF CODE NEEDS TO BE TESTED
-cntrftr = 2*GelState.Iconc(1:2)-GelState.Iold(1:2);
-leftadj = dt*(2*cntrftr(1) - cntrftr(2))*mean(workingSol(1:2))/(workingSol(2)*GelSimParams.hx);
+cntrftr = 1*GelState.Iconc(1:2)-0*GelState.Iold(1:2);
+leftadj = dt*(3*cntrftr(1)/2 - cntrftr(2)/2)*mean(workingSol(1:2))/(workingSol(2)*GelSimParams.hx);
 
 RHSH(1) = RHSH(1) + dt*GelSimParams.HydFluxL/GelSimParams.hx + GelSimParams.HydExchangeRate*leftadj;
 RHSH(end) = RHSH(end) + GelSimParams.HydValR*D(1)*dt*2/(GelSimParams.hx^2); 
@@ -72,8 +72,8 @@ RHSB = conccur + dt*explcur;
 %Now we need to adjust the RHS vector to account for additional fluxes
 %potentially
 %%THIS CHUNK OF CODE NEEDS TO BE TESTED
-cntrftr = 2*GelState.Aconc(1:2)-GelState.Aold(1:2);
-leftadj = dt*(2*cntrftr(1) - cntrftr(2))*mean(workingSol(1:2))/(workingSol(2)*GelSimParams.hx);
+cntrftr = 1*GelState.Aconc(1:2)-0*GelState.Aold(1:2);
+leftadj = dt*(3*cntrftr(1)/2 - cntrftr(2)/2)*mean(workingSol(1:2))/(workingSol(2)*GelSimParams.hx);
 
 RHSB(1) = RHSB(1) + dt*GelSimParams.BicFluxL/GelSimParams.hx + GelSimParams.BicExchangeRate*leftadj;
 RHSB(end) = RHSB(end) + GelSimParams.BicValR*D(2)*dt*2/(GelSimParams.hx^2);;
@@ -101,8 +101,8 @@ RHSI = conccur + dt*explcur;
 %Now we need to adjust the RHS vector to account for additional fluxes
 %potentially
 %%THIS CHUNK OF CODE NEEDS TO BE TESTED
-cntrftr = 2*GelState.Hconc(1:2)-GelState.Hold(1:2);
-leftadj = dt*(2*cntrftr(1) - cntrftr(2))*mean(workingSol(1:2))/(workingSol(2)*GelSimParams.hx);
+cntrftr = 1*GelState.Hconc(1:2)-0*GelState.Hold(1:2);
+leftadj = dt*(3*cntrftr(1)/2 - cntrftr(2)/2)*mean(workingSol(1:2))/(workingSol(2)*GelSimParams.hx);
 
 RHSI(1) = RHSI(1) + dt*GelSimParams.IonFluxL/GelSimParams.hx+GelSimParams.HydExchangeRate*GelSimParams.HydExchangerParam*leftadj;
 RHSI(end) = RHSI(end) + GelSimParams.IonValR*D(3)*dt*2/(GelSimParams.hx^2);
@@ -129,8 +129,8 @@ RHSA = conccur + dt*explcur;
 
 %Now we need to populate the entries which correspond to ghost cells with
 %the appropriate fluxes for Boundary Conditions.
-cntrftr = 2*GelState.Bconc(1:2)-GelState.Bold(1:2);
-leftadj = dt*(2*cntrftr(1) - cntrftr(2))*mean(workingSol(1:2))/(workingSol(2)*GelSimParams.hx);
+cntrftr = 1*GelState.Bconc(1:2)-0*GelState.Bold(1:2);
+leftadj = dt*(3*cntrftr(1)/2 - cntrftr(2)/2)*mean(workingSol(1:2))/(workingSol(2)*GelSimParams.hx);
 
 RHSA(1) = RHSA(1) + dt*GelSimParams.AniFluxL/GelSimParams.hx + GelSimParams.BicExchangeRate*GelSimParams.BicExchangerParam*leftadj;
 RHSA(end) = RHSA(end) + GelSimParams.AniValR*D(4)*dt*2/(GelSimParams.hx^2);
